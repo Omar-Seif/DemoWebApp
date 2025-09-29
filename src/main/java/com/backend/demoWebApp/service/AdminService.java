@@ -2,8 +2,9 @@ package com.backend.demoWebApp.service;
 
 import com.backend.demoWebApp.exception.ConflictException;
 import com.backend.demoWebApp.exception.ResourceNotFoundException;
-import com.backend.demoWebApp.model.Student;
+import com.backend.demoWebApp.model.Instructor2;
 import com.backend.demoWebApp.model.Student2;
+import com.backend.demoWebApp.repository.InstructorRepository;
 import com.backend.demoWebApp.repository.Student2Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,10 @@ public class AdminService {
 
     @Autowired
     private Student2Repository studentRepository;
+
+    @Autowired
+    private InstructorRepository instructorRepository;
+
 
     public List<Student2> getStudents(){
         return studentRepository.findAll();
@@ -48,6 +53,41 @@ public class AdminService {
             throw new ResourceNotFoundException("Student not found with id: " + id);
         }
         studentRepository.deleteById(id);
+    }
+
+
+    // Instructor Management Functions
+
+
+    public List<Instructor2> getInstructors(){
+        return instructorRepository.findAll();
+    }
+
+    public Instructor2 getInstructorById(Long id) {
+        return instructorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor not found with id: " + id));
+    }
+
+    public Instructor2 addInstructor(Instructor2 instructor) {
+        if (instructorRepository.existsByEmail(instructor.getEmail())) {
+            throw new ConflictException("Email already exists: " + instructor.getEmail());
+        }
+        return instructorRepository.save(instructor);
+    }
+
+    public Instructor2 updateInstructor(Instructor2 instructor){
+        Long id = instructor.getId();
+        if (!instructorRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Instructor not found with id: " + id);
+        }
+        return instructorRepository.save(instructor);
+    }
+
+    public void deleteInstructor(Long id){
+        if (!instructorRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Instructor not found with id: " + id);
+        }
+        instructorRepository.deleteById(id);
     }
 
 }

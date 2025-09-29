@@ -1,5 +1,6 @@
 package com.backend.demoWebApp.controller;
 
+import com.backend.demoWebApp.model.Instructor2;
 import com.backend.demoWebApp.model.Student;
 import com.backend.demoWebApp.model.Student2;
 import com.backend.demoWebApp.service.AdminService;
@@ -16,6 +17,8 @@ public class AdminController {
 
     @Autowired
     AdminService service;
+
+    // Student Management Functions
 
     @GetMapping("students")
     public List<Student2> getStudents(){
@@ -47,5 +50,39 @@ public class AdminController {
         service.deleteStudent(id);
         return ResponseEntity.noContent().build();
     }
+
+
+    // Instructor Management Functions
+
+    @GetMapping("instructors")
+    public List<Instructor2> getInstructors(){
+        return service.getInstructors();
+    }
+
+    @GetMapping("instructors/{id}")
+    public Instructor2 getInstructorById(@PathVariable Long id){
+        return service.getInstructorById(id);
+    }
+
+    @PostMapping("instructors")
+    public ResponseEntity<Instructor2> addInstructor(@RequestBody Instructor2 instructor){
+        Instructor2 savedInstructor = service.addInstructor(instructor);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedInstructor);
+    }
+
+    @PutMapping("instructors/{id}")
+    public Instructor2 updateInstructor(@PathVariable Long id, @RequestBody Instructor2 instructor){
+        if (!id.equals(instructor.getId())) {
+            throw new IllegalArgumentException("ID in path must match ID in request body");
+        }
+        return service.updateInstructor(instructor);
+    }
+
+    @DeleteMapping("instructors/{id}")
+    public ResponseEntity<Void> deleteInstructor(@PathVariable Long id){
+        service.deleteInstructor(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
