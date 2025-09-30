@@ -1,5 +1,6 @@
 package com.backend.demoWebApp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,8 +26,9 @@ public class Course {
     @Column(name = "credits", nullable = false)
     private Integer credits;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Eager fetching can cause performance issues
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id")
+    @JsonIgnore // Add this
     private Instructor2 instructor;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)

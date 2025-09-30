@@ -118,4 +118,29 @@ public class AdminController {
     }
 
 
+    // Instructor Course Assignment
+
+
+    @PostMapping("/assign-instructor/{courseId}/{instructorId}")
+    public ResponseEntity<Course> assignInstructorToCourse(
+            @PathVariable Long courseId,
+            @PathVariable Long instructorId) {
+
+        Course updatedCourse = service.assignInstructorToCourse(courseId, instructorId);
+        return ResponseEntity.ok(updatedCourse);
+    }
+
+    @DeleteMapping("/remove-instructor-course/{courseId}")
+    public ResponseEntity<Course> removeInstructorFromCourse(@PathVariable Long courseId) {
+        Course updatedCourse = service.removeInstructorFromCourse(courseId);
+        return ResponseEntity.ok(updatedCourse);
+    }
+
+    @GetMapping("/instructors/{instructorId}/courses")
+    public List<Course> getCoursesByInstructor(@PathVariable Long instructorId) {
+        return service.getCoursesByInstructor(instructorId);
+    }
+
+
+
 }

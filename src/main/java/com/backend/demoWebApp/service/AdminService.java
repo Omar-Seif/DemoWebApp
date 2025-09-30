@@ -11,6 +11,7 @@ import com.backend.demoWebApp.repository.Student2Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -130,6 +131,45 @@ public class AdminService {
         courseRepository.deleteById(id);
     }
 
+
+    // Instructor Course Assignment
+
+    public Course assignInstructorToCourse(Long courseId, Long instructorId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + courseId));
+
+        Instructor2 instructor = instructorRepository.findById(instructorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor not found with id: " + instructorId));
+
+        // Set the bidirectional relationship
+        course.setInstructor(instructor);
+        instructor.addCourse(course);
+
+        return courseRepository.save(course);
+    }
+
+    public Course removeInstructorFromCourse(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + courseId));
+
+        if (course.getInstructor() == null) {
+            throw new ResourceNotFoundException("No instructor assigned to this course");
+        }
+
+        // Remove the bidirectional relationship
+        Instructor2 instructor = course.getInstructor();
+        instructor.removeCourse(course);
+        course.setInstructor(null);
+
+        return courseRepository.save(course);
+    }
+
+    public List<Course> getCoursesByInstructor(Long instructorId) {
+        Instructor2 instructor = instructorRepository.findById(instructorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor not found with id: " + instructorId));
+
+        return new ArrayList<>(instructor.getCourses());
+    }
 
 
 }
