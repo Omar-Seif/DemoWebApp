@@ -4,14 +4,17 @@ import com.backend.demoWebApp.dto.CourseGradeDto;
 import com.backend.demoWebApp.dto.ReportCardDto;
 import com.backend.demoWebApp.dto.StudentUpdateDto;
 import com.backend.demoWebApp.exception.ProductNotFoundException; // Assuming you'll rename this to ResourceNotFoundException
+import com.backend.demoWebApp.model.Course;
 import com.backend.demoWebApp.model.Enrollment;
 import com.backend.demoWebApp.model.Student;
 import com.backend.demoWebApp.model.User;
+import com.backend.demoWebApp.repository.CourseRepository;
 import com.backend.demoWebApp.repository.EnrollmentRepository;
 import com.backend.demoWebApp.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +27,10 @@ public class StudentService {
 
     @Autowired
     private EnrollmentRepository enrollmentRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
+
 
     /**
      * Generates a report card for a specific student.
@@ -78,4 +85,68 @@ public class StudentService {
         dto.setCourses(courseGrades);
         return dto;
     }
+    //course register
+    @Transactional
+    public String registerCourse(Long userId, Long courseId) {
+        // Find student by userId
+        Student student = studentRepository.findByUserId(userId)
+                .orElseThrow(() -> new ProductNotFoundException("Student not found with user ID: " + userId));
+
+        // Find course by courseId
+        var course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ProductNotFoundException("Course not found with ID: " + courseId));
+
+        // Check if already enrolled
+        boolean alreadyEnrolled = enrollmentRepository.findByStudentUserId(userId).stream()
+                .anyMatch(enrollment -> enrollment.getCourse().getId().equals(courseId));
+
+        if (alreadyEnrolled) {
+            return "Student is already enrolled in this course.";
+        }
+
+        // Create new enrollment
+        Enrollment enrollment = new Enrollment();
+        enrollment.setStudent(student);
+        enrollment.setCourse(course);
+        enrollment.setGrade(null); // grade can be null initially
+
+        enrollmentRepository.save(enrollment);
+
+        return "Student enrolled in course successfully!";
+    }
+    @Transactional(readOnly = true)
+    public List<String> getStudentCourses(Long userId) {
+        return enrollmentRepository.findByStudentUserId(userId).stream()
+                .map(enrollment -> enrollment.getCourse().getCourseName()) // you can return whole Course objects if needed
+                .collect(Collectors.toList());
+    }
+    //unregister a course
+    public String unregisterCourse(Long userId, Long courseId) {
+        // Find student
+        Student student = studentRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found with ID: " + userId));
+
+        // Find course
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found with ID: " + courseId));
+
+        // Find the enrollment
+        Enrollment enrollment = enrollmentRepository.findByStudentUserId(userId).stream()
+                .filter(e -> e.getCourse().getId().equals(courseId))
+                .findFirst()
+                .orElse(null);
+
+        if (enrollment == null) {
+            return "Student is not enrolled in this course.";
+        }
+
+        // Delete enrollment
+        enrollmentRepository.delete(enrollment);
+
+        return "Student unregistered from course successfully!";
+    }
+
+
+
+
 }

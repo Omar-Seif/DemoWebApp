@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/api/students")
 public class StudentController {
@@ -33,5 +34,30 @@ public class StudentController {
     public ResponseEntity<User> updateStudentInfo(@PathVariable Long userId, @RequestBody StudentUpdateDto studentUpdateDto) {
         User updatedUser = studentService.updateStudentInfo(userId, studentUpdateDto);
         return ResponseEntity.ok(updatedUser);
+
+
     }
+    //course register
+    @PostMapping("/{userId}/courses/{courseId}")
+    public ResponseEntity<String> registerCourse(@PathVariable Long userId,
+                                                 @PathVariable Long courseId) {
+        String message = studentService.registerCourse(userId, courseId);
+        return ResponseEntity.ok(message);
+    }
+    // GET all courses for a student
+    @GetMapping("/{userId}/courses")
+    public ResponseEntity<?> getStudentCourses(@PathVariable Long userId) {
+        return ResponseEntity.ok(studentService.getStudentCourses(userId));
+    }
+
+    // Unregister course
+    @DeleteMapping("/{userId}/courses/{courseId}")
+    public ResponseEntity<String> unregisterCourse(@PathVariable Long userId,
+                                                   @PathVariable Long courseId) {
+        String message = studentService.unregisterCourse(userId, courseId);
+        return ResponseEntity.ok(message);
+    }
+
+
+
 }
