@@ -50,5 +50,14 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getStudentCourses(userId));
     }
 
+    // Unregister course
+    @DeleteMapping("/{userId}/courses/{courseId}")
+    public ResponseEntity<String> unregisterCourse(@PathVariable Long userId,
+                                                   @PathVariable Long courseId) {
+        String message = studentService.unregisterCourse(userId, courseId);
+        return ResponseEntity.ok(message);
+    }
+
+
 
 }

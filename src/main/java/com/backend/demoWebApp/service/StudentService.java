@@ -4,6 +4,7 @@ import com.backend.demoWebApp.dto.CourseGradeDto;
 import com.backend.demoWebApp.dto.ReportCardDto;
 import com.backend.demoWebApp.dto.StudentUpdateDto;
 import com.backend.demoWebApp.exception.ProductNotFoundException; // Assuming you'll rename this to ResourceNotFoundException
+import com.backend.demoWebApp.model.Course;
 import com.backend.demoWebApp.model.Enrollment;
 import com.backend.demoWebApp.model.Student;
 import com.backend.demoWebApp.model.User;
@@ -119,6 +120,33 @@ public class StudentService {
                 .map(enrollment -> enrollment.getCourse().getCourseName()) // you can return whole Course objects if needed
                 .collect(Collectors.toList());
     }
+    //unregister a course
+    public String unregisterCourse(Long userId, Long courseId) {
+        // Find student
+        Student student = studentRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found with ID: " + userId));
+
+        // Find course
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found with ID: " + courseId));
+
+        // Find the enrollment
+        Enrollment enrollment = enrollmentRepository.findByStudentUserId(userId).stream()
+                .filter(e -> e.getCourse().getId().equals(courseId))
+                .findFirst()
+                .orElse(null);
+
+        if (enrollment == null) {
+            return "Student is not enrolled in this course.";
+        }
+
+        // Delete enrollment
+        enrollmentRepository.delete(enrollment);
+
+        return "Student unregistered from course successfully!";
+    }
+
+
 
 
 }
