@@ -1,7 +1,7 @@
 package com.backend.demoWebApp.controller;
 
+import com.backend.demoWebApp.model.Course;
 import com.backend.demoWebApp.model.Instructor2;
-import com.backend.demoWebApp.model.Student;
 import com.backend.demoWebApp.model.Student2;
 import com.backend.demoWebApp.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +81,39 @@ public class AdminController {
     @DeleteMapping("instructors/{id}")
     public ResponseEntity<Void> deleteInstructor(@PathVariable Long id){
         service.deleteInstructor(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    // Course Management Functions
+
+    @GetMapping("/courses")
+    public List<Course> getAllCourses() {
+        return service.getCourses();
+    }
+
+    @GetMapping("/courses/{id}")
+    public Course getCourseById(@PathVariable Long id) {
+        return service.getCourseById(id);
+    }
+
+    @PostMapping("/courses")
+    public ResponseEntity<Course> addCourse(@RequestBody Course course) {
+        Course savedCourse = service.addCourse(course);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedCourse);
+    }
+
+    @PutMapping("/courses/{id}")
+    public Course updateCourse(@PathVariable Long id, @RequestBody Course course) {
+        if (!id.equals(course.getId())) {
+            throw new IllegalArgumentException("ID in path must match ID in request body");
+        }
+        return service.updateCourse(course);
+    }
+
+    @DeleteMapping("/courses/{id}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
+        service.deleteCourse(id);
         return ResponseEntity.noContent().build();
     }
 

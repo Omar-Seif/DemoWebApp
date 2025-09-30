@@ -1,8 +1,7 @@
 package com.backend.demoWebApp.model;
 
 import jakarta.persistence.*;
-
-import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -13,29 +12,41 @@ public class Instructor2 {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "firstName", nullable = false)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "lastName", nullable = false)
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-//    @OneToMany(mappedBy = "instructor")
-//    private Set<Course> courses;
+    // ✅ Add the bidirectional relationship
+    @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Course> courses = new HashSet<>();
 
-
+    // Constructors
     public Instructor2() {
     }
 
-    public Instructor2(Long id, String firstName, String lastName, String email) {
-        this.id = id;
+    public Instructor2(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
     }
 
+    // Helper methods for managing the relationship
+    public void addCourse(Course course) {
+        courses.add(course);
+        course.setInstructor(this);
+    }
+
+    public void removeCourse(Course course) {
+        courses.remove(course);
+        course.setInstructor(null);
+    }
+
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -66,5 +77,13 @@ public class Instructor2 {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
     }
 }

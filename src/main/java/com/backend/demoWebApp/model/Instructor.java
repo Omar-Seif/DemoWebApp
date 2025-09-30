@@ -25,8 +25,8 @@ public class Instructor {
     @Column(name = "hire_date")
     private Date hireDate;
 
-    @OneToMany(mappedBy = "instructor")
-    private Set<Course> courses;
+//    @OneToMany(mappedBy = "instructor")
+//    private Set<Course> courses;
 
     // Constructors
     public Instructor() {
@@ -81,11 +81,11 @@ public class Instructor {
         this.hireDate = hireDate;
     }
 
-    public Set<Course> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(Set<Course> courses) {
-        this.courses = courses;
-    }
+//    public Set<Course> getCourses() {
+//        return courses;
+//    }
+//
+//    public void setCourses(Set<Course> courses) {
+//        this.courses = courses;
+//    }
 }

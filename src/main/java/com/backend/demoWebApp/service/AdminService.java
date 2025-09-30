@@ -2,8 +2,10 @@ package com.backend.demoWebApp.service;
 
 import com.backend.demoWebApp.exception.ConflictException;
 import com.backend.demoWebApp.exception.ResourceNotFoundException;
+import com.backend.demoWebApp.model.Course;
 import com.backend.demoWebApp.model.Instructor2;
 import com.backend.demoWebApp.model.Student2;
+import com.backend.demoWebApp.repository.CourseRepository;
 import com.backend.demoWebApp.repository.InstructorRepository;
 import com.backend.demoWebApp.repository.Student2Repository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class AdminService {
 
     @Autowired
     private InstructorRepository instructorRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
 
 
     public List<Student2> getStudents(){
@@ -89,5 +94,42 @@ public class AdminService {
         }
         instructorRepository.deleteById(id);
     }
+
+
+    // Course Management Functions
+
+
+    public List<Course> getCourses(){
+        return courseRepository.findAll();
+    }
+
+    public Course getCourseById(Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id: " + id));
+    }
+
+    public Course addCourse(Course course) {
+        if (courseRepository.existsByCourseCode(course.getCourseCode())) {
+            throw new ConflictException("Course code already exists: " + course.getCourseCode());
+        }
+        return courseRepository.save(course);
+    }
+
+    public Course updateCourse(Course course) {
+        Long id = course.getId();
+        if (!courseRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Course not found with id: " + id);
+        }
+        return courseRepository.save(course);
+    }
+
+    public void deleteCourse(Long id) {
+        if (!courseRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Course not found with id: " + id);
+        }
+        courseRepository.deleteById(id);
+    }
+
+
 
 }

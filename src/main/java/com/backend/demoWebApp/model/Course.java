@@ -13,20 +13,21 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "course_code", unique = true)
+    @Column(name = "course_code", unique = true, nullable = false)
     private String courseCode;
 
-    @Column(name = "course_name")
+    @Column(name = "course_name", nullable = false)
     private String courseName;
 
     @Lob // For longer text
     private String description;
 
+    @Column(name = "credits", nullable = false)
     private Integer credits;
 
     @ManyToOne(fetch = FetchType.LAZY) // Eager fetching can cause performance issues
     @JoinColumn(name = "instructor_id")
-    private Instructor instructor;
+    private Instructor2 instructor;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Enrollment> enrollments;
@@ -92,11 +93,11 @@ public class Course {
         this.credits = credits;
     }
 
-    public Instructor getInstructor() {
+    public Instructor2 getInstructor() {
         return instructor;
     }
 
-    public void setInstructor(Instructor instructor) {
+    public void setInstructor(Instructor2 instructor) {
         this.instructor = instructor;
     }
 
